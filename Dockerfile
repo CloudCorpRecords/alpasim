@@ -18,7 +18,7 @@ FROM base-${TARGETARCH}
 # engine is exposed; without it nvJPEG decodes half a level dark.
 ENV NVIDIA_DRIVER_CAPABILITIES=all
 
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.13.0 /uv /uvx /bin/
 COPY --from=dcgm-exporter /usr/bin/dcgm-exporter /usr/bin/dcgm-exporter
 COPY --from=dcgm-exporter /etc/dcgm-exporter /etc/dcgm-exporter
 RUN printf '%s\n' \
@@ -54,14 +54,14 @@ ENV UV_LINK_MODE=copy
 WORKDIR /repo/src/grpc
 RUN --mount=type=secret,id=netrc,target=/root/.netrc \
     --mount=type=cache,target=/root/.cache/uv \
-    sh -c 'if [ -f /root/.netrc ]; then export NETRC=/root/.netrc; fi && uv sync'
+    sh -c 'if [ -f /root/.netrc ]; then export NETRC=/root/.netrc; fi && uv sync --frozen'
 RUN uv run compile-protos --no-sync
 
 WORKDIR /repo
 
 RUN --mount=type=secret,id=netrc,target=/root/.netrc \
     --mount=type=cache,target=/root/.cache/uv \
-    sh -c 'if [ -f /root/.netrc ]; then export NETRC=/root/.netrc; fi && uv sync --extra all --extra recipes --extra transfuser'
+    sh -c 'if [ -f /root/.netrc ]; then export NETRC=/root/.netrc; fi && uv sync --frozen --extra all --extra recipes --extra transfuser'
 RUN uv run --no-sync python third_party/alpamayo-transformers5/apply_patches.py
 
 ARG PYTORCH_VERSION=2.8.0+cu128

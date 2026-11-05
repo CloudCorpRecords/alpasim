@@ -25,6 +25,7 @@
 !pyproject.toml
 !third_party/
 !third_party/alpamayo-transformers5/**
+!uv.lock
 
 # Exclude specific runtime directories/files we don't need
 src/runtime/build.env
